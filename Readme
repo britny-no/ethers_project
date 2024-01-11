@@ -1,0 +1,3 @@
+[실행 순서]
+0. ./api_server/.env,  ./docker.env 설정
+1. docker-compose up --build
