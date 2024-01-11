@@ -6,13 +6,13 @@ import { IncomingWebhook } from '@slack/webhook';
 
 import { BlockRepository } from '@App/module/block/repository/block.repository';
 import { EthersService } from '@App/module/ethers/ethers.service';
+
 @Injectable()
 export class CronService {
   private webhook = new IncomingWebhook(process.env.SLACK_URL);
   constructor(
     private ethersService: EthersService,
-    private blockRepository: BlockRepository,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
+    private blockRepository: BlockRepository, // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
   ) {}
 
   //cron 환경에서 useFilter 사용 불가?
