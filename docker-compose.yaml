@@ -1,0 +1,62 @@
+version: "3.5"
+
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    env_file:
+      - docker.env
+    environment:
+      TZ: Asia/Seoul
+      PGTZ: Asia/Seoul
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    env_file:
+      - docker.env
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  app:
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+    build:
+      context: ./api_server
+      dockerfile: Dockerfile
+    container_name: nest-app
+    environment:
+      NODE_ENV: production
+    restart: always
+    ports:
+      - "3000:3000" # Adjust the port as needed
+    volumes:
+      - ./api_server:/api_server
+    command:
+      - bash
+      - -c
+      - |
+        /api_server/wait-for-it.sh postgres_container:5432 -t 10
+        npm run start:prod
+
+networks:
+  postgres:
+    driver: bridge
